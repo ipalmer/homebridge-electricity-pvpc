@@ -10,6 +10,12 @@
         "type": "string",
         "required": true,
         "default": "Electricity Price Plugin"
+      },
+      "target": {
+        "title": "Target",
+        "type": "number",
+        "required": true,
+        "default": 50
       }
     }
   }
