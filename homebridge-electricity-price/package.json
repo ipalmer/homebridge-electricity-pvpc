@@ -1,16 +1,16 @@
 {
+  "private": true,
   "displayName": "Electricity Price",
-  "name": "homebridge-electricity-pvpc",
-  "version": "1.0.4",
-  "author": "Ivan Palmer",
-  "description": "A plugin to get PVPC price and show in Home Kit environment",
+  "name": "homebridge-electricity-price",
+  "version": "1.0.0",
+  "description": "A short description about what your plugin does.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ipalmer/homebridge-electricity-pvpc.git"
+    "url": "git+https://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
   },
   "bugs": {
-    "url": "https://github.com/ipalmer/homebridge-electricity-pvpc/issues"
+    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
   },
   "engines": {
     "node": "^18.17.0 || ^20.9.0",
@@ -21,20 +21,16 @@
     "lint": "eslint src/**/*.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "homebridge-plugin"
   ],
   "devDependencies": {
-    "@eslint/compat": "^1.1.0",
-    "@eslint/js": "^9.5.0",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
-    "eslint": "^9.5.0",
-    "eslint-plugin-react": "^7.34.3",
-    "globals": "^15.6.0",
+    "eslint": "^8.57.0",
     "homebridge": "^1.7.0",
     "nodemon": "^3.1.0",
     "rimraf": "^5.0.5",
