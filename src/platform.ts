@@ -50,28 +50,10 @@ export class ElectricityPricePlatform implements DynamicPlatformPlugin {
    * must not be registered again to prevent "duplicate UUID" errors.
    */
   discoverDevices() {
-
-    // EXAMPLE ONLY
-    // A real plugin you would discover accessories from the local network, cloud services
-    // or a user-defined array in the platform config.
-    // const exampleDevices = [
-    //   {
-    //     exampleUniqueId: 'ABCD',
-    //     exampleDisplayName: 'Habitación',
-    //   },
-    //   {
-    //     exampleUniqueId: 'EFGH',
-    //     exampleDisplayName: 'Cocina',
-    //   },
-    // ];
-
-    // loop over the discovered devices and register each one if it has not already been registered
-    // for (const device of exampleDevices) {
-
     // generate a unique id for the accessory this should be generated from
     // something globally unique, but constant, for example, the device serial
     // number or MAC address
-    const uuid = this.api.hap.uuid.generate('preciodelaluz');
+    const uuid = this.api.hap.uuid.generate('pvpc');
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
@@ -83,7 +65,7 @@ export class ElectricityPricePlatform implements DynamicPlatformPlugin {
 
       // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
       // existingAccessory.context.device = device;
-      // this.api.updatePlatformAccessories([existingAccessory]);
+      this.api.updatePlatformAccessories([existingAccessory]);
 
       // create the accessory handler for the restored accessory
       // this is imported from `platformAccessory.ts`
@@ -91,18 +73,14 @@ export class ElectricityPricePlatform implements DynamicPlatformPlugin {
 
       // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
       // remove platform accessories when no longer present
-      // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-      // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+      this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
     } else {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', 'Precio de la luz');
+      this.log.info('Adding new accessory:', 'PVPC');
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory('Precio de la luz', uuid);
-
-      // store a copy of the device object in the `accessory.context`
-      // the `context` property can be used to store any data about the accessory you may need
-      // accessory.context.device = device;
+      const accessory = new this.api.platformAccessory('PVPC', uuid);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
@@ -112,5 +90,4 @@ export class ElectricityPricePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
     }
   }
-  // }
 }
