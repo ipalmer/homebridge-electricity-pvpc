@@ -1,29 +1,44 @@
 {
-	"name": "homebridge-energy-price",
-	"version": "1.2.2",
-	"description": "Monitors the ComEd energy price for use in automations",
-	"author": "john2691",
-	"license": "MIT",
-	"main": "index.js",
-	"keywords": [
-		"homebridge-plugin",
-		"Energy",
-		"Price",
-		"ComEd"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/john2691/homebridge-energy-price"
-	},
-	"bugs": {
-		"url": "https://github.com/john2691/homebridge-energy-price/issues"
-	},
-	"dependencies": {
-		"axios": ">=0.21.1"
-	},
-	"devDependencies": {},
-	"engines": {
-    "homebridge": ">=1.3.5",
-    "node": ">=16.13.0"
-	}
+  "private": true,
+  "displayName": "Electricity Price",
+  "name": "homebridge-electricity-pvpc",
+  "version": "1.0.0",
+  "description": "A plugin to get PVPC price and show in Home Kit environment",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipalmer/homebridge-electricity-pvpc"
+  },
+  "bugs": {
+    "url": "https://github.com/ipalmer/homebridge-electricity-pvpc/issues"
+  },
+  "engines": {
+    "node": "^18.17.0 || ^20.9.0",
+    "homebridge": "^1.6.0"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint src/**/*.ts --max-warnings=0",
+    "watch": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
+    "eslint": "^8.57.0",
+    "homebridge": "^1.7.0",
+    "nodemon": "^3.1.0",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0"
+  }
 }

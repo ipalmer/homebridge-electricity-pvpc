@@ -1,31 +1,16 @@
 {
-	"pluginAlias": "Energy Price",
-	"pluginType": "accessory",
-	"schema": {
-		"name": {
-			"title": "Name",
-			"type": "string",
-			"required": true,
-			"default": "Energy Price"
-		},
-		"manufacturer": {
-			"title": "Manufacturer",
-			"type": "string",
-			"required": false,
-			"default": "ComEd"
-		},
-		"model": {
-			"title": "Model",
-			"type": "string",
-			"required": false,
-			"default": "Energy Price Monitor"
-		},
-		"refreshInterval": {
-			"title": "Refresh Interval",
-			"type": "integer",
-			"required": false,
-			"description": "Specifies the number of minutes between ComEd polls and updates. Default is 5."
-
-		}
-	}
+  "pluginAlias": "ElectricityPricePlugin",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Electricity Price Plugin"
+      }
+    }
+  }
 }
