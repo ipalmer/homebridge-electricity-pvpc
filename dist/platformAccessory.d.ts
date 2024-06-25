@@ -1,4 +1,4 @@
-import { PlatformAccessory } from 'homebridge';
+import { PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { ElectricityPricePlatform } from './platform';
 /**
  * Platform Accessory
@@ -13,6 +13,14 @@ export declare class ElectricityPriceAccessory {
      * These are just used to create a working example
      * You should implement your own code to track the state of your accessory
      */
+    private offPeakState;
+    private pricePercentage;
+    private colorHue;
     constructor(platform: ElectricityPricePlatform, accessory: PlatformAccessory);
+    getOn(): Promise<CharacteristicValue>;
+    getBrightness(): Promise<CharacteristicValue>;
+    setBrightness(value: CharacteristicValue): Promise<void>;
+    getHue(): Promise<CharacteristicValue>;
+    setHue(value: CharacteristicValue): Promise<void>;
 }
 //# sourceMappingURL=platformAccessory.d.ts.map
