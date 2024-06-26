@@ -1,7 +1,7 @@
 {
   "displayName": "Electricity Price",
   "name": "homebridge-electricity-pvpc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "Ivan Palmer",
   "description": "A plugin to get PVPC price and show in Home Kit environment",
   "license": "Apache-2.0",

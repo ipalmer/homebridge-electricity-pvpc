@@ -28,6 +28,7 @@ export class ElectricityPriceAccessory {
    */
   private offPeakState: boolean = false;
   private pricePercentage: number = 0;
+  private colorHue: number = 100;
 
   constructor(
     private readonly platform: ElectricityPricePlatform,
@@ -37,6 +38,7 @@ export class ElectricityPriceAccessory {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'preciodelaluz.org')
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, 'k2ihjJH7ENu8')
       .setCharacteristic(this.platform.Characteristic.Model, 'Internet Switch');
 
     // get the Lightbulb service if it exists, otherwise create a new Lightbulb service
@@ -52,8 +54,14 @@ export class ElectricityPriceAccessory {
       .onGet(this.getOn.bind(this));
 
     this.service.getCharacteristic(this.platform.Characteristic.Brightness)
-      .onGet(this.getBrightness.bind(this));
+      .onGet(this.getBrightness.bind(this))
+      .onSet(this.setBrightness.bind(this));
 
+    this.service.getCharacteristic(this.platform.Characteristic.Hue)
+      .onGet(this.getHue.bind(this))
+      .onSet(this.setHue.bind(this));
+
+    this.service.getCharacteristic(this.platform.Characteristic.Saturation).updateValue(100.0);
 
     const updateLightPrice = () => {
       fetch('https://api.preciodelaluz.org/v1/prices/all?zone=PCB')
@@ -93,7 +101,7 @@ export class ElectricityPriceAccessory {
           const currentPriceInfo = body[`${currentHour.toString().padStart(2, '0')}-${(currentHour + 1).toString().padStart(2, '0')}`];
           const currentPrice = currentPriceInfo ? currentPriceInfo.price : 0;
           this.pricePercentage = 100 - (((currentPrice - minPrice) / (maxPrice - minPrice)) * 100);
-          this.offPeakState = currentPrice < weightedAveragePrice;
+          this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
 
           this.platform.log.debug(`${currentHour.toString().padStart(2, '0')}-${(currentHour + 1).toString().padStart(2, '0')}`);
           this.platform.log.debug(`Average Price ${weightedAveragePrice.toFixed(2)} o ${averagePrice.toFixed(2)}`);
@@ -104,6 +112,8 @@ export class ElectricityPriceAccessory {
           // Turns the light bulb on or off based on whether the current price is below the weighted average
           this.platform.log.debug(`Light price is cheap ${this.offPeakState}`);
           this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
+
+          // this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
         })
         .catch(error => this.platform.log.debug(`Failed to update light price: ${error}`));
     };
@@ -116,11 +126,28 @@ export class ElectricityPriceAccessory {
   }
 
   async getOn(): Promise<CharacteristicValue> {
-    // disables the change by the user and only returns the value obtained by the price of electricity
     return this.offPeakState;
   }
 
   async getBrightness(): Promise<CharacteristicValue> {
     return this.pricePercentage;
   }
+
+  async setBrightness(value: CharacteristicValue): Promise<void> {
+    this.colorHue = (value as number / 120) * 100;
+    this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
+    this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue(this.colorHue);
+    this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
+  }
+
+  async getHue(): Promise<CharacteristicValue> {
+    return this.colorHue;
+  }
+
+  async setHue(value: CharacteristicValue): Promise<void> {
+    this.colorHue = value as number;
+    this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
+    this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
+  }
+
 }
