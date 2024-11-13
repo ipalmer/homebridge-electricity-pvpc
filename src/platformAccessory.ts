@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import cron from 'node-cron';
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, PlatformConfig, CharacteristicValue } from 'homebridge';
 
 import { ElectricityPricePlatform } from './platform';
 
