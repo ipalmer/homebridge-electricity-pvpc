@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import cron from 'node-cron';
-import { Service, PlatformAccessory, PlatformConfig, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 
 import { ElectricityPricePlatform } from './platform';
 
@@ -41,6 +41,7 @@ export class ElectricityPriceAccessory {
   constructor(
     private readonly platform: ElectricityPricePlatform,
     private readonly accessory: PlatformAccessory,
+    private readonly token: String,
   ) {
 
     // set accessory information
@@ -77,7 +78,7 @@ export class ElectricityPriceAccessory {
           headers: {
               'Accept': 'application/json; application/vnd.esios-api-v1+json',
               'Content-Type': 'application/json',
-              'x-api-key': this.config.token
+              'x-api-key': token
           }
         })
         .then(res => res.json())
