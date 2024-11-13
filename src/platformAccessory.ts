@@ -4,16 +4,6 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 
 import { ElectricityPricePlatform } from './platform';
 
-interface PriceInfo {
-  date: string;
-  hour: string;
-  'is-cheap': boolean;
-  'is-under-avg': boolean;
-  market: string;
-  price: number;
-  units: string;
-}
-
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -64,16 +54,24 @@ export class ElectricityPriceAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.Saturation).updateValue(100.0);
 
     const updateLightPrice = () => {
-      fetch('https://api.preciodelaluz.org/v1/prices/all?zone=PCB')
+      fetch('https://api.esios.ree.es/indicators/1001', {
+          method: 'GET',
+          headers: {
+              'Accept': 'application/json; application/vnd.esios-api-v1+json',
+              'Content-Type': 'application/json'
+              /*'x-api-key': 'la_clave_que_solicitamos_por_email'*/
+          }
+        })
         .then(res => res.json())
-        .then((body: Record<string, PriceInfo>) => {
+        .then(body => {
+          let values = body['indicator']['values'].filter((e: any) => e['geo_id'] == 8741).filter((e: any) => e['price'] = e.value / 1000)
           let maxPrice = 0;
           let minPrice = Infinity;
 
           // Calculate the weighted average of prices
           let sum = 0;
           let weightSum = 0;
-          for (const priceInfo of Object.values(body)) {
+          for (const priceInfo of values) {
             const weight = 1 / priceInfo.price;
             sum += priceInfo.price * weight;
             weightSum += weight;
@@ -90,7 +88,7 @@ export class ElectricityPriceAccessory {
           // Calculate the average of the prices
           let sum2 = 0;
           let count = 0;
-          for (const priceInfo of Object.values(body)) {
+          for (const priceInfo of values) {
             sum2 += priceInfo.price;
             count += 1;
           }
@@ -98,12 +96,13 @@ export class ElectricityPriceAccessory {
 
           // Get the current price
           const currentHour = new Date().getHours();
-          const currentPriceInfo = body[`${currentHour.toString().padStart(2, '0')}-${(currentHour + 1).toString().padStart(2, '0')}`];
+          const currentPriceInfo = values[currentHour.toString().padStart(2, '0')];
           const currentPrice = currentPriceInfo ? currentPriceInfo.price : 0;
           this.pricePercentage = 100 - (((currentPrice - minPrice) / (maxPrice - minPrice)) * 100);
           this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
 
-          this.platform.log.debug(`${currentHour.toString().padStart(2, '0')}-${(currentHour + 1).toString().padStart(2, '0')}`);
+          const currentDateTime = new Date(currentPriceInfo.datetime)
+          this.platform.log.debug(`${currentDateTime.getHours().toString().padStart(2, '0')}-${(currentDateTime.getHours() + 1).toString().padStart(2, '0')}`);
           this.platform.log.debug(`Average Price ${weightedAveragePrice.toFixed(2)} o ${averagePrice.toFixed(2)}`);
           this.platform.log.debug(`Current Price ${currentPrice} percentage ${this.pricePercentage}`);
           this.platform.log.debug(`Updating light price to ${this.pricePercentage}`);
@@ -113,9 +112,9 @@ export class ElectricityPriceAccessory {
           this.platform.log.debug(`Light price is cheap ${this.offPeakState}`);
           this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
 
-          // this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
+          this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
         })
-        .catch(error => this.platform.log.debug(`Failed to update light price: ${error}`));
+        .catch(error => console.log(`Failed to update light price: ${error}`));
     };
 
     // Llama a la función de actualización inmediatamente
