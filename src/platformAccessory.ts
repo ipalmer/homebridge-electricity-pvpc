@@ -76,8 +76,8 @@ export class ElectricityPriceAccessory {
           method: 'GET',
           headers: {
               'Accept': 'application/json; application/vnd.esios-api-v1+json',
-              'Content-Type': 'application/json'
-              /*'x-api-key': 'la_clave_que_solicitamos_por_email'*/
+              'Content-Type': 'application/json',
+              'x-api-key': this.config.token
           }
         })
         .then(res => res.json())
