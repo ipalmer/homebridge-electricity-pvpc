@@ -4,6 +4,24 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 
 import { ElectricityPricePlatform } from './platform';
 
+interface IndicatorInfo {
+  id: number;
+  name: string;
+  short_name: string;
+  composited: boolean;
+  step_type: string;
+  disaggregated: boolean;
+  values_updated_at: string;
+  values: [PriceInfo];
+}
+
+interface PriceInfo {
+  geo_id: number;
+  value: number;
+  datetime: string;
+  price: number;
+}
+
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -63,8 +81,8 @@ export class ElectricityPriceAccessory {
           }
         })
         .then(res => res.json())
-        .then(body => {
-          let values = body['indicator']['values'].filter((e: any) => e['geo_id'] == 8741).filter((e: any) => e['price'] = e.value / 1000)
+        .then((body: Record<string, IndicatorInfo>)  => {
+          let values = body.indicator.values.filter((e: any) => e['geo_id'] == 8741).filter((e: any) => e['price'] = e.value / 1000)
           let maxPrice = 0;
           let minPrice = Infinity;
 
@@ -114,7 +132,7 @@ export class ElectricityPriceAccessory {
 
           this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
         })
-        .catch(error => console.log(`Failed to update light price: ${error}`));
+        .catch(error => this.platform.log.debug(`Failed to update light price: ${error}`));
     };
 
     // Llama a la función de actualización inmediatamente

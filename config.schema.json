@@ -11,11 +11,11 @@
         "required": true,
         "default": "Electricity Price Plugin"
       },
-      "target": {
-        "title": "Target",
-        "type": "number",
+      "token": {
+        "title": "Token",
+        "type": "string",
         "required": true,
-        "default": 50
+        "default": "Your token for API esios"
       }
     }
   }
