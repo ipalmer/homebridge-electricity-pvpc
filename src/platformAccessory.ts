@@ -121,19 +121,19 @@ export class ElectricityPriceAccessory {
           this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
 
           const currentDateTime = new Date(currentPriceInfo.datetime)
-          this.platform.log.debug(`${currentDateTime.getHours().toString().padStart(2, '0')}-${(currentDateTime.getHours() + 1).toString().padStart(2, '0')}`);
-          this.platform.log.debug(`Average Price ${weightedAveragePrice.toFixed(2)} o ${averagePrice.toFixed(2)}`);
-          this.platform.log.debug(`Current Price ${currentPrice} percentage ${this.pricePercentage}`);
-          this.platform.log.debug(`Updating light price to ${this.pricePercentage}`);
+          this.log.info(`${currentDateTime.getHours().toString().padStart(2, '0')}-${(currentDateTime.getHours() + 1).toString().padStart(2, '0')}`);
+          this.log.info(`Average Price ${weightedAveragePrice.toFixed(2)} o ${averagePrice.toFixed(2)}`);
+          this.log.info(`Current Price ${currentPrice} percentage ${this.pricePercentage}`);
+          this.log.info(`Updating light price to ${this.pricePercentage}`);
           this.service.getCharacteristic(this.platform.Characteristic.Brightness).updateValue(this.pricePercentage);
 
           // Turns the light bulb on or off based on whether the current price is below the weighted average
-          this.platform.log.debug(`Light price is cheap ${this.offPeakState}`);
+          this.log.info(`Light price is cheap ${this.offPeakState} from Hue ${this.colorHue}`);
           this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
 
           this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
         })
-        .catch(error => this.platform.log.debug(`Failed to update light price: ${error}`));
+        .catch(error => this.log.info(`Failed to update light price: ${error}`));
     };
 
     // Llama a la función de actualización inmediatamente
