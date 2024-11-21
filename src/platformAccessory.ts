@@ -20,6 +20,7 @@ interface PriceInfo {
   value: number;
   datetime: string;
   price: number;
+  hour: string;
 }
 
 /**
@@ -83,7 +84,9 @@ export class ElectricityPriceAccessory {
         })
         .then(res => res.json())
         .then((body: Record<string, IndicatorInfo>)  => {
-          let values = body.indicator.values.filter((e: any) => e['geo_id'] == 8741).filter((e: any) => e['price'] = e.value / 1000)
+          let values = body.indicator.values.filter((e: PriceInfo) => e['geo_id'] == 8741)
+                                            .filter((e: PriceInfo) => e['price'] = e.value / 1000)
+                                            .filter((e: PriceInfo) => e['hour'] = (new Date(e.datetime).getHours().toString().padStart(2, '0')))
           let maxPrice = 0;
           let minPrice = Infinity;
 
@@ -115,25 +118,25 @@ export class ElectricityPriceAccessory {
 
           // Get the current price
           const currentHour = new Date().getHours();
-          const currentPriceInfo = values[currentHour.toString().padStart(2, '0')];
+          const currentPriceInfo = values.filter((e: PriceInfo) => e.hour == currentHour.toString().padStart(2, '0'))[0];
           const currentPrice = currentPriceInfo ? currentPriceInfo.price : 0;
           this.pricePercentage = 100 - (((currentPrice - minPrice) / (maxPrice - minPrice)) * 100);
           this.offPeakState = this.pricePercentage > (20 + (this.colorHue * 80) / 120 / 120 * 100);
 
+          this.platform.log.info('---------------------------------------------')
+
           const currentDateTime = new Date(currentPriceInfo.datetime)
-          this.log.info(`${currentDateTime.getHours().toString().padStart(2, '0')}-${(currentDateTime.getHours() + 1).toString().padStart(2, '0')}`);
-          this.log.info(`Average Price ${weightedAveragePrice.toFixed(2)} o ${averagePrice.toFixed(2)}`);
-          this.log.info(`Current Price ${currentPrice} percentage ${this.pricePercentage}`);
-          this.log.info(`Updating light price to ${this.pricePercentage}`);
-          this.service.getCharacteristic(this.platform.Characteristic.Brightness).updateValue(this.pricePercentage);
+          this.platform.log.info(`Current Hour ${currentDateTime.getHours().toString().padStart(2, '0')}-${(currentDateTime.getHours() + 1).toString().padStart(2, '0')}`);
+          this.platform.log.info(`Weighted Price ${weightedAveragePrice.toFixed(2)} vs Average Price ${averagePrice.toFixed(2)}`);
+          this.platform.log.info(`Current Price ${currentPrice} percentage ${this.pricePercentage}`);
+          this.platform.log.info(`Light price is cheap ${this.offPeakState} from Hue ${this.colorHue}%`);
 
           // Turns the light bulb on or off based on whether the current price is below the weighted average
-          this.log.info(`Light price is cheap ${this.offPeakState} from Hue ${this.colorHue}`);
+          this.service.getCharacteristic(this.platform.Characteristic.Brightness).updateValue(this.pricePercentage);
           this.service.getCharacteristic(this.platform.Characteristic.On).updateValue(this.offPeakState);
-
           this.service.getCharacteristic(this.platform.Characteristic.Hue).updateValue((this.pricePercentage / 100) * 120);
         })
-        .catch(error => this.log.info(`Failed to update light price: ${error}`));
+        .catch(error => this.platform.log.error(`Failed to update light price: ${error}`));
     };
 
     // Llama a la función de actualización inmediatamente
